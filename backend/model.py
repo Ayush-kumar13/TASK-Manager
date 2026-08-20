@@ -17,5 +17,5 @@ class Task(Base):
     priority = Column(String, default="medium")
     status = Column(String, default="pending")
     deadline = Column(Date)
-    user_id=Column(Integer,ForeignKey('users.id'),nullable=False)
+    user_id=Column(Integer,ForeignKey('users.id'),nullable=True)
     

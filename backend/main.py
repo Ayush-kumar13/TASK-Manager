@@ -3,8 +3,15 @@ from sqlalchemy.orm import Session
 from database import Base, engine,SessionLocal
 import model
 from schema import TaskCreate,TaskUpdate
-
+from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 Base.metadata.create_all(bind=engine)
 
@@ -84,4 +91,4 @@ def delete_task(task_id:int,db:Session=Depends(get_db)):
     db.delete(task)
     db.commit()
     db.refresh()
-    return {'message':'task deleted '}
+    return {'message':'the task deleted '}
