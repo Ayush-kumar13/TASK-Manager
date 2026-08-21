@@ -2,7 +2,7 @@ from fastapi import FastAPI,Depends,HTTPException
 from sqlalchemy.orm import Session
 from database import Base, engine,SessionLocal
 import model
-from schema import TaskCreate,TaskUpdate
+from schema import TaskCreate,TaskUpdate,UserCreate,UserLogin
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 app.add_middleware(
@@ -90,5 +90,53 @@ def delete_task(task_id:int,db:Session=Depends(get_db)):
         return{'message:':"task not found"}
     db.delete(task)
     db.commit()
-    db.refresh()
+
     return {'message':'the task deleted '}
+
+@app.post("/register")
+def register_user(user: UserCreate, db: Session = Depends(get_db)):
+
+    existing_user = (
+        db.query(model.User)
+        .filter(model.User.email == user.email)
+        .first()
+    )
+
+    if existing_user:
+        return {"message": "Email already registered"}
+
+    new_user = model.User(
+        name=user.name,
+        email=user.email,
+        password=user.password
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return {
+        "message": "User registered successfully",
+        "user_id": new_user.id
+    }
+@app.post('/login')
+def login_user(user: UserLogin, db: Session = Depends(get_db)):
+    existing_user = (
+        db.query(model.User)
+        .filter(model.User.email == user.email)
+        .first()
+    )
+
+    if not existing_user:
+        return {"message": "Invalid email or password"}
+
+    if existing_user.password != user.password:
+        return {"message": "Invalid email or password"}
+
+    return {
+        "message": "Login successful",
+        "user_id": existing_user.id,
+        "name": existing_user.name,
+        "email": existing_user.email
+    }
+    
