@@ -1,12 +1,15 @@
-from sqlalchemy import Column, Integer, String, Date,ForeignKey
+from sqlalchemy import Column, Integer, String, Date, ForeignKey
 from database import Base
+
 
 class User(Base):
     __tablename__ = "users"
+
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
+
 
 class Task(Base):
     __tablename__ = "tasks"
@@ -16,6 +19,10 @@ class Task(Base):
     description = Column(String)
     priority = Column(String, default="medium")
     status = Column(String, default="pending")
-    deadline = Column(Date)
-    user_id=Column(Integer,ForeignKey('users.id'),nullable=True)
-    
+    deadline = Column(Date,nullable=True)
+
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=True
+    )
