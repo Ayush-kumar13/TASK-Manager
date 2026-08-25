@@ -35,7 +35,7 @@ const StatsCards = ({ tasks }) => {
     </h2>
   </div>
 
-  <div className="bg-white rounded-xl border border-gray-200 p-6 w-60">
+  <div className='bg-white backdrop-blur-xl border border-gray-200 rounded-2xl p-6 w-60 shadow-xl'>
     <p className="text-gray-500 text-sm">
       In Progress
     </p>

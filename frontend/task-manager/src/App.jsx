@@ -6,13 +6,24 @@ import StatsCards from "./components/StatsCards";
 import MyTasks from "./components/MyTasks";
 import CreateTask from "./components/CreateTask";
 import SetTheme from "./components/SetTheme";
+import Login from "./components/Login";
+import Register from "./components/Register";
 
 function App() {
   const [tasks, setTasks] = useState([]);
   const [showCreateTask, setShowCreateTask] = useState(false);
-  const [refreshTasks, setRefreshTasks] = useState(false);
-  const [darkMode,setDarkMode]=useState(false)
 
+  const [refreshTasks, setRefreshTasks] = useState(false);
+
+  const [darkMode, setDarkMode] = useState(false);
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const [showRegister, setShowRegister] = useState(false);
+
+  const [user, setUser] = useState(null);
+
+  // Get all tasks
   const fetchTasks = async () => {
     try {
       const response = await axios.get(
@@ -25,67 +36,105 @@ function App() {
     }
   };
 
+  // Fetch tasks after login
   useEffect(() => {
-    fetchTasks();
-  }, [refreshTasks]);
+    if (isLoggedIn) {
+      fetchTasks();
+    }
+  }, [isLoggedIn, refreshTasks]);
 
+  // Login / Register screen
+  if (!isLoggedIn) {
+
+    if (showRegister) {
+      return (
+        <Register
+          onRegister={() => setShowRegister(false)}
+          onBackToLogin={() => setShowRegister(false)}
+        />
+      );
+    }
+
+    return (
+      <Login
+        onLogin={(userData) => {
+          setUser(userData);
+          setIsLoggedIn(true);
+        }}
+        onRegister={() => setShowRegister(true)}
+      />
+    );
+  }
+
+  // Dashboard
   return (
-  <div
-  className={`flex min-h-screen ${
-    darkMode
-      ? "bg-gray-900"
-      : "bg-white"
-  }`}
->
-      <Sidebar />
+    <div
+      className={`flex min-h-screen ${
+        darkMode ? "bg-gray-900" : "bg-gray-50"
+      }`}
+    >
 
-      <main className="flex-1 p-10 text-white">
+      {/* Sidebar */}
+      <Sidebar
+        onLogout={() => {
+          setUser(null);
+          setIsLoggedIn(false);
+        }}
+      />
 
-<div className="flex justify-between items-start">
+      {/* Main Content */}
+      <main className="flex-1 p-10">
 
-  <div>
-    <h1 className="text-3xl font-bold">
-      Good morning, Ayush 👋
-    </h1>
+        {/* Header */}
+        <div className="flex justify-between items-start">
 
-    <p className="text-gray-500 mt-2">
-      Manage your tasks and stay productive.
-    </p>
-  </div>
+          <div>
+            <h1
+              className={`text-3xl font-bold ${
+                darkMode ? "text-white" : "text-gray-900"
+              }`}
+            >
+              Good morning, {user?.name || "Ayush"} 👋
+            </h1>
 
+            <p className="text-gray-500 mt-2">
+              Manage your tasks and stay productive.
+            </p>
+          </div>
 
-  <div className="flex items-center gap-4">
+          {/* Profile */}
+          <div className="flex items-center gap-4">
 
-    {/* Notification */}
-    <button className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50">
-      🔔
-    </button>
+            <button className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50">
+              🔔
+            </button>
 
+            <div className="flex items-center gap-3">
 
-    {/* Profile */}
-    <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gray-900 text-white flex items-center justify-center font-semibold">
+                {user?.name?.charAt(0).toUpperCase() || "A"}
+              </div>
 
-      <div className="w-10 h-10 rounded-full bg-gray-900 text-white flex items-center justify-center font-semibold">
-        A
-      </div>
+              <div>
+                <p className="text-sm font-semibold">
+                  {user?.name || "Ayush Kumar"}
+                </p>
 
-      <div>
-        <p className="text-sm font-semibold">
-          Ayush Kumar
-        </p>
+                <p className="text-xs text-gray-500">
+                  {user?.email || "User"}
+                </p>
+              </div>
 
-        <p className="text-xs text-gray-500">
-          User
-        </p>
-      </div>
+            </div>
 
-    </div>
+          </div>
 
-  </div>
+        </div>
 
-</div>
+        {/* Stats Cards */}
         <StatsCards tasks={tasks} />
 
+        {/* My Tasks */}
         <MyTasks
           tasks={tasks}
           setTasks={setTasks}
@@ -93,20 +142,23 @@ function App() {
           refreshTasks={refreshTasks}
         />
 
+        {/* Create Task Modal */}
         {showCreateTask && (
           <CreateTask
             onClose={() => setShowCreateTask(false)}
-            onTaskCreated={() =>
-              setRefreshTasks((prev) => !prev)
-            }
+            onTaskCreated={() => {
+              setRefreshTasks((prev) => !prev);
+            }}
           />
         )}
-        <SetTheme 
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}/>
+
+        {/* Theme */}
+        <SetTheme
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+        />
 
       </main>
-
     </div>
   );
 }

@@ -1,29 +1,35 @@
 import { useState } from "react";
 import axios from "axios";
 
-function Login({ onLogin, onRegister }) {
+function Register({ onRegister, onBackToLogin }) {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/login",
+        "http://127.0.0.1:8000/register",
         {
+          name,
           email,
           password,
         }
       );
 
-      if (response.data.message === "Login successful") {
-        onLogin(response.data);
+      if (
+        response.data.message ===
+        "User registered successfully"
+      ) {
+        alert("Registration successful!");
+        onRegister();
       } else {
         alert(response.data.message);
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Register error:", error);
       alert("Something went wrong");
     }
   };
@@ -34,16 +40,29 @@ function Login({ onLogin, onRegister }) {
       <div className="w-full max-w-md bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
 
         <h1 className="text-3xl font-bold text-center">
-          Welcome Back
+          Create Account
         </h1>
 
         <p className="text-gray-500 text-center mt-2">
-          Login to your Task Manager
+          Create your Task Manager account
         </p>
 
-        <form onSubmit={handleLogin} className="mt-8">
+        <form onSubmit={handleRegister} className="mt-8">
 
           <label className="block text-sm font-medium mb-2">
+            Name
+          </label>
+
+          <input
+            type="text"
+            placeholder="Enter your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg outline-none"
+            required
+          />
+
+          <label className="block text-sm font-medium mb-2 mt-5">
             Email
           </label>
 
@@ -62,7 +81,7 @@ function Login({ onLogin, onRegister }) {
 
           <input
             type="password"
-            placeholder="Enter your password"
+            placeholder="Create a password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg outline-none"
@@ -73,16 +92,16 @@ function Login({ onLogin, onRegister }) {
             type="submit"
             className="w-full mt-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800"
           >
-            Login
+            Create Account
           </button>
 
         </form>
 
         <button
-          onClick={onRegister}
+          onClick={onBackToLogin}
           className="w-full mt-4 text-sm text-gray-500 hover:text-black"
         >
-          Don't have an account? Create Account
+          Already have an account? Login
         </button>
 
       </div>
@@ -91,4 +110,4 @@ function Login({ onLogin, onRegister }) {
   );
 }
 
-export default Login;
+export default Register;

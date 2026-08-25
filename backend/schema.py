@@ -15,4 +15,10 @@ class TaskUpdate(BaseModel):
     priority: str | None = None
     status: str | None = None
     deadline: date | None = None
-
+class UserCreate(BaseModel):
+    name:str
+    email:str
+    password:str
+class UserLogin(BaseModel):
+    email: str
+    password: str
